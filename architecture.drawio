@@ -1,0 +1,165 @@
+<mxfile host="app.diagrams.net" modified="2026-03-13" version="21.0.0">
+  <diagram id="rag-db2-arch" name="RAG DB2 Architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ── CLIENT ── -->
+        <mxCell id="10" value="&lt;b&gt;Client&lt;/b&gt;&lt;br&gt;curl / browser" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="570" y="20" width="180" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- ── DOCKER COMPOSE BORDER ── -->
+        <mxCell id="20" value="&lt;b&gt;Docker Compose&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;strokeWidth=2;dashed=1;fontSize=13;fontStyle=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="30" y="105" width="970" height="620" as="geometry"/>
+        </mxCell>
+
+        <!-- ── RAG-APP CONTAINER ── -->
+        <mxCell id="30" value="&lt;b&gt;rag-app&lt;/b&gt;  ·  Python 3.11  ·  :8000" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="50" y="135" width="580" height="570" as="geometry"/>
+        </mxCell>
+
+        <!-- main.py -->
+        <mxCell id="40" value="&lt;b&gt;main.py&lt;/b&gt;&lt;br&gt;FastAPI REST API&lt;br&gt;&lt;br&gt;POST /ingest/url&lt;br&gt;POST /ingest/file&lt;br&gt;POST /query&lt;br&gt;GET /sources&lt;br&gt;GET /health" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="75" y="185" width="195" height="145" as="geometry"/>
+        </mxCell>
+
+        <!-- rag.py -->
+        <mxCell id="60" value="&lt;b&gt;rag.py&lt;/b&gt;&lt;br&gt;&lt;br&gt;① Embed query (BGE)&lt;br&gt;② Cosine vector search&lt;br&gt;③ Full-text search (BM25)&lt;br&gt;④ Hybrid rerank&lt;br&gt;⑤ Call Claude API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="390" y="185" width="205" height="145" as="geometry"/>
+        </mxCell>
+
+        <!-- ingest.py -->
+        <mxCell id="50" value="&lt;b&gt;ingest.py&lt;/b&gt;&lt;br&gt;&lt;br&gt;① Download PDF (User-Agent fix)&lt;br&gt;② Strip headers / page nums&lt;br&gt;③ Sentence-aware chunking&lt;br&gt;④ Embed passages (BGE)&lt;br&gt;⑤ Store → pgvector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="75" y="390" width="205" height="145" as="geometry"/>
+        </mxCell>
+
+        <!-- model_cache volume -->
+        <mxCell id="90" value="model_cache&lt;br&gt;(HuggingFace volume)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="395" y="395" width="155" height="65" as="geometry"/>
+        </mxCell>
+
+        <!-- db.py -->
+        <mxCell id="70" value="&lt;b&gt;db.py&lt;/b&gt;&lt;br&gt;psycopg2 + pgvector&lt;br&gt;&lt;br&gt;similarity_search()&lt;br&gt;fulltext_search()&lt;br&gt;insert_chunks() / delete_chunks()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="235" y="570" width="215" height="105" as="geometry"/>
+        </mxCell>
+
+        <!-- pdf_cache volume -->
+        <mxCell id="80" value="pdf_cache&lt;br&gt;(volume)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="75" y="575" width="120" height="65" as="geometry"/>
+        </mxCell>
+
+        <!-- ── RAG-POSTGRES CONTAINER ── -->
+        <mxCell id="100" value="&lt;b&gt;rag-postgres&lt;/b&gt;  ·  pgvector/pgvector:pg16" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;fontStyle=1;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;" vertex="1" parent="1">
+          <mxGeometry x="665" y="135" width="305" height="420" as="geometry"/>
+        </mxCell>
+
+        <!-- PostgreSQL + pgvector -->
+        <mxCell id="110" value="&lt;b&gt;PostgreSQL 16&lt;/b&gt; + pgvector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="685" y="195" width="265" height="55" as="geometry"/>
+        </mxCell>
+
+        <!-- chunks table -->
+        <mxCell id="120" value="&lt;b&gt;chunks&lt;/b&gt; table&lt;br&gt;id · source · page_num&lt;br&gt;chunk_index · content&lt;br&gt;embedding vector(1024)&lt;br&gt;metadata JSON&lt;br&gt;&lt;br&gt;&lt;b&gt;ingested_sources&lt;/b&gt; table" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="685" y="275" width="265" height="135" as="geometry"/>
+        </mxCell>
+
+        <!-- postgres_data volume -->
+        <mxCell id="130" value="postgres_data&lt;br&gt;(volume)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="755" y="440" width="130" height="65" as="geometry"/>
+        </mxCell>
+
+        <!-- ── EXTERNAL SERVICES ── -->
+
+        <!-- IBM Docs -->
+        <mxCell id="140" value="&lt;b&gt;IBM Docs&lt;/b&gt;&lt;br&gt;ibm.com/docs/...&lt;br&gt;rbafzpdf.pdf · 9.2 MB · 1814 pages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="200" width="200" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- HuggingFace -->
+        <mxCell id="150" value="&lt;b&gt;HuggingFace Hub&lt;/b&gt;&lt;br&gt;BAAI/bge-large-en-v1.5&lt;br&gt;1024-dim · cached locally" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="370" width="200" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- Anthropic -->
+        <mxCell id="160" value="&lt;b&gt;Anthropic Claude API&lt;/b&gt;&lt;br&gt;claude-sonnet-4&lt;br&gt;Answer generation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="510" width="200" height="75" as="geometry"/>
+        </mxCell>
+
+        <!-- ── EDGES ── -->
+
+        <!-- Client → main.py -->
+        <mxCell id="e1" value="HTTP :8000" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" source="10" target="40" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- main.py → ingest.py -->
+        <mxCell id="e2" value="POST /ingest" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="40" target="50" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- main.py → rag.py -->
+        <mxCell id="e3" value="POST /query" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="40" target="60" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ingest.py → db.py -->
+        <mxCell id="e4" value="insert chunks" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="50" target="70" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- rag.py → db.py -->
+        <mxCell id="e5" value="search" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="60" target="70" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- db.py → PostgreSQL -->
+        <mxCell id="e6" value="SQL + pgvector" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="70" target="110" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- PostgreSQL → chunks table (internal) -->
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="110" target="120" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- chunks table → postgres_data -->
+        <mxCell id="e14" value="persisted" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;" edge="1" source="120" target="130" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ingest.py → IBM Docs -->
+        <mxCell id="e7" value="HTTPS download" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;" edge="1" source="50" target="140" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ingest.py → pdf_cache -->
+        <mxCell id="e8" value="cache" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;" edge="1" source="50" target="80" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ingest.py → model_cache (embed passages) -->
+        <mxCell id="e9" value="embed passages" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="50" target="90" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- rag.py → model_cache (embed query) -->
+        <mxCell id="e10" value="embed query" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="60" target="90" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- model_cache → HuggingFace -->
+        <mxCell id="e11" value="download on first run" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;dashed=1;" edge="1" source="90" target="150" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- rag.py → Anthropic -->
+        <mxCell id="e12" value="generate answer" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=9;" edge="1" source="60" target="160" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

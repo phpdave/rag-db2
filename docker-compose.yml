@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: rag-postgres
+    environment:
+      POSTGRES_DB: ragdb
+      POSTGRES_USER: raguser
+      POSTGRES_PASSWORD: ragpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raguser -d ragdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: ./app
+    container_name: rag-app
+    environment:
+      - DATABASE_URL=postgresql://raguser:ragpassword@postgres:5432/ragdb
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - PDF_URL=${PDF_URL:-https://www.ibm.com/docs/es/ssw_ibm_i_75/pdf/rbafzpdf.pdf}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-BAAI/bge-large-en-v1.5}
+      - CHUNK_SIZE=${CHUNK_SIZE:-400}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-50}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - model_cache:/root/.cache/huggingface
+      - pdf_cache:/app/pdfs
+
+volumes:
+  postgres_data:
+  model_cache:
+  pdf_cache:
