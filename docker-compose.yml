@@ -29,6 +29,9 @@ services:
       - EMBEDDING_MODEL=${EMBEDDING_MODEL:-BAAI/bge-large-en-v1.5}
       - CHUNK_SIZE=${CHUNK_SIZE:-400}
       - CHUNK_OVERLAP=${CHUNK_OVERLAP:-50}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    runtime: nvidia
     ports:
       - "8000:8000"
     depends_on:

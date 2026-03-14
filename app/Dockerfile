@@ -8,9 +8,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps first (better layer caching)
+# Install Python deps — PyTorch CUDA index takes priority so we get the
+# GPU-enabled wheel; PyPI is the fallback for everything else.
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    --index-url https://download.pytorch.org/whl/cu124 \
+    --extra-index-url https://pypi.org/simple
 
 # Copy application code
 COPY . .
