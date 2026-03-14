@@ -73,15 +73,20 @@ class IngestFileRequest(BaseModel):
 
 
 class QueryRequest(BaseModel):
-    question:  str
-    top_k:     int   = 8
-    max_tokens: int  = 2048
+    question:    str
+    top_k:       int  = 8
+    max_tokens:  int  = 2048
+    execute_sql: bool = False
 
 
 class SourceInfo(BaseModel):
     source:      str
     chunk_count: int
     ingested_at: str
+
+
+class IBMiExecRequest(BaseModel):
+    sql: str
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -166,6 +171,14 @@ def ingest_status(source: str):
     return {"source": source, "status": status}
 
 
+@app.post("/ibmi/exec")
+def ibmi_exec(req: IBMiExecRequest):
+    """Execute any SQL statement directly against IBM i (DDL, DML, SELECT)."""
+    import ibmi
+    result = ibmi.run_statement(req.sql)
+    return result
+
+
 @app.post("/query")
 def query(req: QueryRequest):
     """
@@ -179,7 +192,7 @@ def query(req: QueryRequest):
         )
 
     import rag
-    result = rag.ask(req.question, top_k=req.top_k, max_tokens=req.max_tokens)
+    result = rag.ask(req.question, top_k=req.top_k, max_tokens=req.max_tokens, execute_sql=req.execute_sql)
 
     return {
         "question": req.question,
@@ -198,4 +211,5 @@ def query(req: QueryRequest):
             "prompt_tokens":   result.prompt_tokens,
             "response_tokens": result.response_tokens,
         },
+        "sql_results": result.sql_results,
     }

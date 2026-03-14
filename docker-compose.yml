@@ -29,6 +29,11 @@ services:
       - CHUNK_OVERLAP=${CHUNK_OVERLAP:-50}
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - IBMI_HOST=${IBMI_HOST:-pub400.com}
+      - IBMI_PORT=${IBMI_PORT:-446}
+      - IBMI_USER=${IBMI_USER}
+      - IBMI_PASSWORD=${IBMI_PASSWORD}
+      - IBMI_SSL=${IBMI_SSL:-0}
     runtime: nvidia
     ports:
       - "8000:8000"
@@ -36,6 +41,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
+      - ./app:/app
       - model_cache:/root/.cache/huggingface
       - pdf_cache:/app/pdfs
 

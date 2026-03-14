@@ -2,10 +2,18 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# System deps: gcc for psycopg2, wget for health checks
+# System deps + IBM i Access ODBC Driver (for IBM i / AS400 — NOT ibm_db which is LUW/z/OS)
+# Repo uses trusted=yes (no GPG key needed): https://public.dhe.ibm.com/software/ibmi/products/odbc/debs/dists/1.1.0/
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     wget \
+    curl \
+    apt-transport-https \
+    unixodbc \
+    unixodbc-dev \
+    && echo "deb [trusted=yes] https://public.dhe.ibm.com/software/ibmi/products/odbc/debs 1.1.0 main" \
+       > /etc/apt/sources.list.d/ibm-iaccess.list \
+    && apt-get update && apt-get install -y --no-install-recommends ibm-iaccess \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python deps — PyTorch CUDA index takes priority so we get the

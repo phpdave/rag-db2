@@ -145,6 +145,19 @@ If the answer is not covered by the excerpts, say so clearly rather than \
 guessing. When relevant, cite the page number from the documentation.\
 """
 
+_SYSTEM_PROMPT_EXECUTE = """\
+You are an expert on IBM Db2 for i (AS/400) SQL with access to a live IBM i system.
+Use the documentation excerpts below as a reference when helpful, but you are NOT
+limited to them — you can write SQL for any table or schema the user mentions.
+
+Rules:
+- Always produce ONE complete, executable SELECT statement in a ```sql code block.
+- Use the exact table/schema names the user provides.
+- For catalog queries, prefer QSYS2 views (QSYS2.SYSTABLES, QSYS2.SYSCOLUMNS, etc.).
+- Do not add FETCH FIRST clauses — the system adds a row limit automatically.
+- Be concise. Show the SQL first, then a brief explanation.\
+"""
+
 
 def build_context(results: list[SearchResult]) -> str:
     parts = []
@@ -166,6 +179,7 @@ class RAGResponse:
     sources:   list[SearchResult]
     prompt_tokens:    int
     response_tokens:  int
+    sql_results: dict | None = None
 
 
 def ask(
@@ -173,6 +187,7 @@ def ask(
     top_k: int = 8,
     model: str = "claude-sonnet-4-20250514",
     max_tokens: int = 2048,
+    execute_sql: bool = False,
 ) -> RAGResponse:
     """
     Full RAG pipeline: embed → retrieve → generate.
@@ -194,16 +209,28 @@ def ask(
         f"---\n\nQuestion: {question}"
     )
 
+    system = _SYSTEM_PROMPT_EXECUTE if execute_sql else _SYSTEM_PROMPT
+
     response = client.messages.create(
         model      = model,
         max_tokens = max_tokens,
-        system     = _SYSTEM_PROMPT,
+        system     = system,
         messages   = [{"role": "user", "content": user_message}],
     )
 
+    answer = response.content[0].text
+
+    sql_results = None
+    if execute_sql:
+        import ibmi
+        sql = ibmi.extract_sql(answer)
+        if sql:
+            sql_results = ibmi.run_sql(sql)
+
     return RAGResponse(
-        answer          = response.content[0].text,
+        answer          = answer,
         sources         = results,
         prompt_tokens   = response.usage.input_tokens,
         response_tokens = response.usage.output_tokens,
+        sql_results     = sql_results,
     )

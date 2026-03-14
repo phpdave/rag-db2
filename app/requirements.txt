@@ -11,3 +11,4 @@ tqdm>=4.66.0
 numpy>=1.26.0
 torch>=2.2.0
 transformers>=4.40.0
+pyodbc>=5.0.0
