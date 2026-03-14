@@ -17,17 +17,21 @@ import pyodbc
 
 
 def _conn_str() -> str:
-    host     = os.environ.get("IBMI_HOST", "pub400.com")
-    user     = os.environ["IBMI_USER"]
-    password = os.environ["IBMI_PASSWORD"]
-    return (
+    host           = os.environ.get("IBMI_HOST", "pub400.com")
+    user           = os.environ["IBMI_USER"]
+    password       = os.environ["IBMI_PASSWORD"]
+    default_schema = os.environ.get("IBMI_DEFAULT_SCHEMA", "")
+    conn = (
         "DRIVER={IBM i Access ODBC Driver 64-bit};"
         f"SYSTEM={host};"
         f"UID={user};"
         f"PWD={password};"
-        "TRANSLATE=1;"      # EBCDIC → ASCII auto-translation
+        "TRANSLATE=1;"
         "UNICODESQL=1;"
     )
+    if default_schema:
+        conn += f"DefaultLibraries={default_schema};"
+    return conn
 
 
 def get_conn() -> pyodbc.Connection:

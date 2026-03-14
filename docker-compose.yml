@@ -34,6 +34,7 @@ services:
       - IBMI_USER=${IBMI_USER}
       - IBMI_PASSWORD=${IBMI_PASSWORD}
       - IBMI_SSL=${IBMI_SSL:-0}
+      - IBMI_DEFAULT_SCHEMA=${IBMI_DEFAULT_SCHEMA:-}
     runtime: nvidia
     ports:
       - "8000:8000"
