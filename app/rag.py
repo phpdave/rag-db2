@@ -223,9 +223,9 @@ def ask(
     sql_results = None
     if execute_sql:
         import ibmi
-        sql = ibmi.extract_sql(answer)
+        sql = ibmi.extract_all_sql(answer)
         if sql:
-            sql_results = ibmi.run_sql(sql)
+            sql_results = ibmi.run_all_statements(sql)
 
     return RAGResponse(
         answer          = answer,

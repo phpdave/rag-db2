@@ -48,6 +48,36 @@ def extract_sql(text: str) -> str | None:
     return None
 
 
+def extract_all_sql(text: str) -> str | None:
+    """Return the first ```sql block found, regardless of statement type."""
+    blocks = re.findall(r'```(?:sql)?\s*(.*?)```', text, re.DOTALL | re.IGNORECASE)
+    for block in blocks:
+        block = block.strip()
+        if block:
+            return block
+    return None
+
+
+def _split_statements(sql: str) -> list[str]:
+    """Split a SQL block on semicolons, stripping comments and blank statements."""
+    # Remove single-line comments
+    sql = re.sub(r'--[^\n]*', '', sql)
+    parts = [s.strip() for s in sql.split(';')]
+    return [p for p in parts if p]
+
+
+def run_all_statements(sql: str) -> list[dict]:
+    """
+    Execute every statement in a SQL block (DDL, DML, SELECT) sequentially.
+    Returns a list of result dicts, one per statement.
+    """
+    statements = _split_statements(sql)
+    results = []
+    for stmt in statements:
+        results.append(run_statement(stmt))
+    return results
+
+
 def _add_row_limit(sql: str, limit: int = 100) -> str:
     """Append FETCH FIRST N ROWS ONLY if not already present."""
     if not re.search(r'FETCH\s+FIRST', sql, re.IGNORECASE):
